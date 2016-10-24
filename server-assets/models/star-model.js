@@ -22,7 +22,7 @@ let Star = DS.defineResource({
       }
     }
   }
-})
+}) 
 
 
 function create(star, cb) {
