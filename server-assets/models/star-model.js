@@ -26,8 +26,14 @@ let Star = DS.defineResource({
 
 
 function create(star, cb) {
-  // Use the Resource Model to create a new star
-  Star.create({ id: uuid.v4(), name: star.name, galaxyId: star.galaxyId}).then(cb).catch(cb)
+  // Use the Resource Model to create a new star 
+  DS.find('galaxy', star.galaxyId).then(function(galaxy){
+      Star.create({
+        id: uuid.v4(),
+        name: star.name,
+        galaxyId: star.galaxyId})
+        .then(cb).catch(cb)
+  }).catch(cb)
 }
 
 function getAll(query, cb) {

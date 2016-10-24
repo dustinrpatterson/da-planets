@@ -17,7 +17,13 @@ let Planet = DS.defineResource({
             },
             galaxy:{
                 localField:'galaxy',
-                localKey:'galaxyId',
+                localKey:'galaxyId'
+            }
+        },
+        hasMany: {
+            moon:{
+                localField: "moons",
+                localKey: "planetId"
             }
         }
     }
@@ -33,7 +39,6 @@ function create(planet, cb){
             starId: planet.starId})
             .then(cb).catch(cb)
     }).catch(cb)
-
 }
 
 function getAll(query, cb){
