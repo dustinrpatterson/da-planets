@@ -64,9 +64,6 @@ function create(star, cb) {
   }
   return color
 }
-
-
-
       Star.create({
         id: uuid.v4(),
         name: star.name,
@@ -74,7 +71,6 @@ function create(star, cb) {
         color: starColorDescription(star.temp),
         galaxyId: star.galaxyId})
         .then(cb).catch(cb)
-
 }
 
 function getAll(query, cb) {
