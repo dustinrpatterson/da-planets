@@ -29,15 +29,43 @@ let Planet = DS.defineResource({
     }
 })
 
+schemator.defineSchema("planet",{
+    id: {
+        type: 'string',
+        nullable: false
+    },
+    name: {
+        type: "string",
+        nullable: false
+    },
+    starId: {
+        type: 'string',
+        nullable: false
+    },
+    galaxyId: {
+        type: "string",
+        nullable: false
+    }
+})
+
 function create(planet, cb){
 
     DS.find('star', planet.starId).then(function(star){
-        Planet.create({
+    let planetObj = {
             id: uuid.v4(), 
             name: planet.name, 
             galaxyId: star.galaxyId, 
-            starId: planet.starId})
-            .then(cb).catch(cb)
+            starId: planet.starId
+    }
+
+    let error = schemator.validateSync("planet", planetObj);
+    if(error){
+        error.stack  = true
+        return cb(error)
+    }
+    
+    Planet.create(planetObj)
+       .then(cb).catch(cb)
     }).catch(cb)
 }
 

@@ -27,15 +27,48 @@ let Moon = DS.defineResource({
     }
 })
 
+schemator.defineSchema("moon",{
+    id: {
+        type: 'string',
+        nullable: false
+    },
+    name: {
+        type: "string",
+        nullable: false
+    },
+    planetId: {
+        type: 'string',
+        nullable: false
+    },
+    starId: {
+        type: 'string',
+        nullable: false
+    },
+    galaxyId: {
+        type: "string",
+        nullable: false
+    }
+})
+
 function create(moon, cb){
 
     DS.find('planet', moon.planetId).then(function(planet){
-        Moon.create({
+    let moonObj = {
             id: uuid.v4(), 
             name: moon.name, 
             galaxyId: planet.galaxyId, 
             starId: planet.starId,
-            planetId: moon.planetId})
+            planetId: moon.planetId
+    }
+
+    let error = schemator.validateSync("moon", moonObj);
+    if(error){
+        error.stack  = true
+        return cb(error)
+    }
+
+        
+        Moon.create(moonObj)
             .then(cb).catch(cb)
     }).catch(cb)
 }
