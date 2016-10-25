@@ -12,28 +12,69 @@ let Star = DS.defineResource({
     belongsTo: {
       galaxy: {
         localField: 'galaxy',
-        localKey: 'galaxyId'
+        localKey: 'galaxyId',
+        parent: true
       }
     },
     hasMany:{
       planet:{
         localField:"planets",
-        foreignKey:"starId"
+        foreignKey: "starId"
+      },
+      moon:{
+        localField: 'moons',
+        foreignKey: 'starId'
       }
     }
   }
 }) 
 
 
+function colorDescription(temp){
+  if(temp >= 7500){
+    color = "blue"
+  }else if(temp < 7500 && temp >= 6000){
+    color = "blue to white"
+  }else if(temp <6000 && temp >= 5000){
+    color = "white to yellow"
+  }else if(temp < 5000 && temp >= 3500){
+    color = "orange to red"
+  }else if(temp < 3500){
+    color = "red"
+  }
+  return color;
+}
 function create(star, cb) {
-  // Use the Resource Model to create a new star 
-  DS.find('galaxy', star.galaxyId).then(function(galaxy){
+ 
+  function starColorDescription(temp){
+  if(temp >= 7500){
+    color = 'blue';
+  }
+  else if(temp >= 6000 && temp < 7500){
+    color = 'blue to white';
+  }
+  else if(temp >= 5000 && temp < 6000){
+    color = 'white to yellow';
+  }
+  else if(temp >= 3500 && temp < 5000){
+    color = 'orange to red';
+  }
+  else{
+    color = 'red';
+  }
+  return color
+}
+
+
+
       Star.create({
         id: uuid.v4(),
         name: star.name,
+        temp: star.temp +'k',
+        color: starColorDescription(star.temp),
         galaxyId: star.galaxyId})
         .then(cb).catch(cb)
-  }).catch(cb)
+
 }
 
 function getAll(query, cb) {
