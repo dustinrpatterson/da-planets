@@ -3,7 +3,7 @@ let dataAdapter = require('./data-adapter'),
     uuid = dataAdapter.uuid,
     schemator = dataAdapter.schemator,
     DS = dataAdapter.DS;
-    formatQuery = dataAdapter.formatQuery;
+formatQuery = dataAdapter.formatQuery;
 
 let Creature = DS.defineResource({
     name: 'creature',
@@ -11,12 +11,33 @@ let Creature = DS.defineResource({
     filepath: __dirname + '/../data/creatures.db',
     relations: {
         hasMany: {
-            galaxy:[{
+            galaxy: [{
                 localField: "galaxies",
                 localKeys: "galaxyIds"
-            },{
-                localField:"knownGalaxies",
-                localKeys:"creatureIds"
+            }, {
+                localField: "knownGalaxies",
+                foreignKeys: "creatureIds"
+            }],
+            star: [{
+                localField: "stars",
+                localKeys: "starIds"
+            }, {
+                localField: "knownStars",
+                foreignKeys: "creatureIds"
+            }],
+            planet: [{
+                localField: "planets",
+                localKeys: "planetIds"
+            }, {
+                localField: "knownPlanets",
+                foreignKeys: "creatureIds"
+            }],
+            moon: [{
+                localField: "moons",
+                localKeys: "moonIds"
+            }, {
+                localField: "knownMoons",
+                foreignKeys: "creatureIds"
             }]
         }
     }
@@ -24,7 +45,7 @@ let Creature = DS.defineResource({
 
 
 
-function create(creature, cb){
+function create(creature, cb) {
 
     let creatureObj = {
         id: uuid.v4(),
@@ -35,34 +56,54 @@ function create(creature, cb){
     Creature.create(creatureObj).then(cb).catch(cb)
 }
 
-function inhabitGalaxy(creatureId, locationId, cb){
-    DS.find('galaxy', galaxyId).then(function(galaxy){
-        Creature.find(creatureId).then(function(creature){
+function inhabitLocation(creatureId, type, id, cb) {
+    DS.find(type, id).then(function (habitat) {
+        Creature.find(creatureId).then(function (creature) {
 
-            creature.galaxyIds[galaxyId] = galaxyId
-            galaxy.creatureIds = galaxy.creatureIds || {}
-            galaxy.creatureIds[creatureId] = creatureId
+            creature[type + "Ids"] = creature[type + "Ids"] || {}
+            creature[type + "Ids"][id] = id;
+            habitat.creatureIds = habitat.creatureIds || {}
+            habitat.creatureIds[creatureId] = creatureId
 
             Creature.update(creature.id, creature).then(function(){
-                DS.update('galaxy', galaxy.id, galaxy).then(cb).catch(cb)
+                DS.update(type, id, habitat).then(cb).catch(cb)
             }).catch(cb)
+
 
         }).catch(cb)
     }).catch(cb)
 }
 
 
-function getAll(query, cb){
+// function inhabitGalaxy(creatureId, galaxyId, cb) {
+//     DS.find('galaxy', galaxyId).then(function (galaxy) {
+//         Creature.find(creatureId).then(function (creature) {
+
+//             creature.galaxyIds[galaxyId] = galaxyId
+//             galaxy.creatureIds = galaxy.creatureIds || {}
+//             galaxy.creatureIds[creatureId] = creatureId
+
+//             Creature.update(creature.id, creature).then(function () {
+//                 DS.update('galaxy', galaxy.id, galaxy).then(cb).catch(cb)
+//             }).catch(cb)
+
+//         }).catch(cb)
+//     }).catch(cb)
+// }
+
+
+function getAll(query, cb) {
     Creature.findAll({}).then(cb).catch(cb)
 }
 
-function getById(id, query, cb){
+function getById(id, query, cb) {
     Creature.find(id, formatQuery(query)).then(cb).catch(cb)
 }
 
 module.exports = {
-  create,
-  getAll,
-  inhabitGalaxy,
-  getById
+    create,
+    getAll,
+    // inhabitGalaxy,
+    inhabitLocation,
+    getById
 }

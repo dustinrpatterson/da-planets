@@ -2,7 +2,7 @@ let dataAdapter = require('./data-adapter'),
     uuid = dataAdapter.uuid,
     schemator = dataAdapter.schemator,
     DS = dataAdapter.DS;
-    formatQuery = dataAdapter.formatQuery;
+formatQuery = dataAdapter.formatQuery;
 
 let Moon = DS.defineResource({
     name: 'moon',
@@ -19,15 +19,25 @@ let Moon = DS.defineResource({
                 localField: 'star',
                 localKey: 'starId',
             },
-            galaxy:{
-                localField:'galaxy',
-                localKey:'galaxyId'
+            galaxy: {
+                localField: 'galaxy',
+                localKey: 'galaxyId'
             }
+        },
+        hasMany: {
+            creature: [{
+                localField: 'creatures',
+                //many to many relationship. (notice foriegn keys(s))
+                foreignKeys: 'galaxyIds'
+            }, {
+                localField: "knownCreatures",
+                localKeys: "creatureIds"
+            }]
         }
     }
 })
 
-schemator.defineSchema("moon",{
+schemator.defineSchema("moon", {
     id: {
         type: 'string',
         nullable: false
@@ -50,39 +60,39 @@ schemator.defineSchema("moon",{
     }
 })
 
-function create(moon, cb){
+function create(moon, cb) {
 
-    DS.find('planet', moon.planetId).then(function(planet){
-    let moonObj = {
-            id: uuid.v4(), 
-            name: moon.name, 
-            galaxyId: planet.galaxyId, 
+    DS.find('planet', moon.planetId).then(function (planet) {
+        let moonObj = {
+            id: uuid.v4(),
+            name: moon.name,
+            galaxyId: planet.galaxyId,
             starId: planet.starId,
             planetId: moon.planetId
-    }
+        }
 
-    let error = schemator.validateSync("moon", moonObj);
-    if(error){
-        error.stack  = true
-        return cb(error)
-    }
+        let error = schemator.validateSync("moon", moonObj);
+        if (error) {
+            error.stack = true
+            return cb(error)
+        }
 
-        
+
         Moon.create(moonObj)
             .then(cb).catch(cb)
     }).catch(cb)
 }
 
-function getAll(query, cb){
+function getAll(query, cb) {
     Moon.findAll({}).then(cb).catch(cb)
 }
 
-function getById(id, query, cb){
+function getById(id, query, cb) {
     Moon.find(id, formatQuery(query)).then(cb).catch(cb)
 }
 
 module.exports = {
-  create,
-  getAll,
-  getById
+    create,
+    getAll,
+    getById
 }

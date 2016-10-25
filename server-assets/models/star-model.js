@@ -2,7 +2,7 @@ let dataAdapter = require('./data-adapter'),
   uuid = dataAdapter.uuid,
   schemator = dataAdapter.schemator,
   DS = dataAdapter.DS;
-  formatQuery = dataAdapter.formatQuery;
+formatQuery = dataAdapter.formatQuery;
 
 let Star = DS.defineResource({
   name: 'star',
@@ -16,61 +16,70 @@ let Star = DS.defineResource({
         parent: true
       }
     },
-    hasMany:{
-      planet:{
-        localField:"planets",
+    hasMany: {
+      planet: {
+        localField: "planets",
         foreignKey: "starId"
       },
-      moon:{
+      moon: {
         localField: 'moons',
         foreignKey: 'starId'
-      }
+      },
+      creature: [{
+        localField: 'creatures',
+        //many to many relationship. (notice foriegn keys(s))
+        foreignKeys: 'galaxyIds'
+      }, {
+        localField: "knownCreatures",
+        localKeys: "creatureIds"
+      }]
     }
   }
-}) 
+})
 
 
-function colorDescription(temp){
-  if(temp >= 7500){
+function colorDescription(temp) {
+  if (temp >= 7500) {
     color = "blue"
-  }else if(temp < 7500 && temp >= 6000){
+  } else if (temp < 7500 && temp >= 6000) {
     color = "blue to white"
-  }else if(temp <6000 && temp >= 5000){
+  } else if (temp < 6000 && temp >= 5000) {
     color = "white to yellow"
-  }else if(temp < 5000 && temp >= 3500){
+  } else if (temp < 5000 && temp >= 3500) {
     color = "orange to red"
-  }else if(temp < 3500){
+  } else if (temp < 3500) {
     color = "red"
   }
   return color;
 }
 function create(star, cb) {
- 
-  function starColorDescription(temp){
-  if(temp >= 7500){
-    color = 'blue';
+
+  function starColorDescription(temp) {
+    if (temp >= 7500) {
+      color = 'blue';
+    }
+    else if (temp >= 6000 && temp < 7500) {
+      color = 'blue to white';
+    }
+    else if (temp >= 5000 && temp < 6000) {
+      color = 'white to yellow';
+    }
+    else if (temp >= 3500 && temp < 5000) {
+      color = 'orange to red';
+    }
+    else {
+      color = 'red';
+    }
+    return color
   }
-  else if(temp >= 6000 && temp < 7500){
-    color = 'blue to white';
-  }
-  else if(temp >= 5000 && temp < 6000){
-    color = 'white to yellow';
-  }
-  else if(temp >= 3500 && temp < 5000){
-    color = 'orange to red';
-  }
-  else{
-    color = 'red';
-  }
-  return color
-}
-      Star.create({
-        id: uuid.v4(),
-        name: star.name,
-        temp: star.temp +'k',
-        color: starColorDescription(star.temp),
-        galaxyId: star.galaxyId})
-        .then(cb).catch(cb)
+  Star.create({
+    id: uuid.v4(),
+    name: star.name,
+    temp: star.temp + 'k',
+    color: starColorDescription(star.temp),
+    galaxyId: star.galaxyId
+  })
+    .then(cb).catch(cb)
 }
 
 function getAll(query, cb) {

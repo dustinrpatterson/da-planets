@@ -2,7 +2,7 @@ let dataAdapter = require('./data-adapter'),
     uuid = dataAdapter.uuid,
     schemator = dataAdapter.schemator,
     DS = dataAdapter.DS;
-    formatQuery = dataAdapter.formatQuery;
+formatQuery = dataAdapter.formatQuery;
 
 let Planet = DS.defineResource({
     name: 'planet',
@@ -15,21 +15,29 @@ let Planet = DS.defineResource({
                 localKey: 'starId',
                 parent: true
             },
-            galaxy:{
-                localField:'galaxy',
-                localKey:'galaxyId'
+            galaxy: {
+                localField: 'galaxy',
+                localKey: 'galaxyId'
             }
         },
         hasMany: {
-            moon:{
+            moon: {
                 localField: "moons",
                 localKey: "planetId"
-            }
+            },
+            creature: [{
+                localField: 'creatures',
+                //many to many relationship. (notice foriegn keys(s))
+                foreignKeys: 'galaxyIds'
+            }, {
+                localField: "knownCreatures",
+                localKeys: "creatureIds"
+            }]
         }
     }
 })
 
-schemator.defineSchema("planet",{
+schemator.defineSchema("planet", {
     id: {
         type: 'string',
         nullable: false
@@ -48,37 +56,37 @@ schemator.defineSchema("planet",{
     }
 })
 
-function create(planet, cb){
+function create(planet, cb) {
 
-    DS.find('star', planet.starId).then(function(star){
-    let planetObj = {
-            id: uuid.v4(), 
-            name: planet.name, 
-            galaxyId: star.galaxyId, 
+    DS.find('star', planet.starId).then(function (star) {
+        let planetObj = {
+            id: uuid.v4(),
+            name: planet.name,
+            galaxyId: star.galaxyId,
             starId: planet.starId
-    }
+        }
 
-    let error = schemator.validateSync("planet", planetObj);
-    if(error){
-        error.stack  = true
-        return cb(error)
-    }
-    
-    Planet.create(planetObj)
-       .then(cb).catch(cb)
+        let error = schemator.validateSync("planet", planetObj);
+        if (error) {
+            error.stack = true
+            return cb(error)
+        }
+
+        Planet.create(planetObj)
+            .then(cb).catch(cb)
     }).catch(cb)
 }
 
-function getAll(query, cb){
+function getAll(query, cb) {
     Planet.findAll({}).then(cb).catch(cb)
 }
 
-function getById(id, query, cb){
+function getById(id, query, cb) {
     Planet.find(id, formatQuery(query)).then(cb).catch(cb)
 }
 
 module.exports = {
-  create,
-  getAll,
-  getById
+    create,
+    getAll,
+    getById
 }
