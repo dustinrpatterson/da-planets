@@ -18,14 +18,14 @@ server.use('/api', cors(handlers.corsOptions), routes.router)
 server.use('/', handlers.defaultErrorHandler)
 
 //socket connection
-io.on('connection', function(socket){
-  console.log('a user connected');
+// io.on('connection', function(socket){
+//   console.log('a user connected');
 
-  setInterval(() => {
-    io.emit('update','the time is: ' + new Date().getTime());
-  }, 1000);
+//   setInterval(() => {
+//     io.emit('update','the time is: ' + new Date().getTime());
+//   }, 1000);
 
-});
+// });
 
 http.listen(port, function () {
   console.log(`Creating worlds on port: ${port}`);

@@ -7,23 +7,32 @@
 </head>
 
 <body>
-	<h1>DA PLANETS WILL BE HERE SOON</h1>
+	<h1>THE UNIVERSE</h1>
 
-	<universe></universe>
+	<universe>
+    <div class="galaxy"> 
+      <h1>LIST OF GALAXIES</h1>
+    <div id="galaxy">
+      </div>
+    </div>
+
+  </universe>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="service.js"></script>
+  <script src="controller.js"></script> 
 
-
-	<script src="app.js"></script>
+	
   <script src="/socket.io/socket.io.js"></script>
-	<script>
+	<!--<script>
         var socket = io();
 
         socket.on('update', function(msg){
           console.log('update: ', msg);
         });
-</script>
+</script>-->
 
 </body>
 
 </html>
+
